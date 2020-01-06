@@ -29,85 +29,39 @@
       <div class="cart_list">
 
         <ul>
-          <li class="item">
+          <li
+            class="item"
+            v-for="(item,index) in list"
+            :key="index"
+          >
             <div class="left_food">
-              <img src="../assets/images/1.jpg" />
+              <img :src="api+item.img_url" />
               <div class="food_info">
-                <p>老干妈炒肥肠</p>
-                <p class="price">¥48</p>
+                <p>{{item.title}}</p>
+                <p class="price">¥{{item.price}}</p>
               </div>
 
             </div>
 
             <div class="right_cart">
               <div class="cart_num">
-                <div class="input_left">-</div>
+                <div
+                  class="input_left"
+                  @click="decCount(item,index)"
+                >-</div>
                 <div class="input_center">
                   <input
+                    v-model="item.num"
                     type="text"
                     readonly="readonly"
-                    value="1"
                     name="num"
                     id="num"
                   />
                 </div>
-                <div class="input_right">+</div>
-              </div>
-            </div>
-
-          </li>
-
-          <li class="item">
-            <div class="left_food">
-              <img src="../assets/images/1.jpg" />
-              <div class="food_info">
-                <p>老干妈炒肥肠</p>
-                <p class="price">¥48</p>
-              </div>
-
-            </div>
-
-            <div id="right_cart">
-              <div class="cart_num">
-                <div class="input_left">-</div>
-                <div class="input_center">
-                  <input
-                    type="text"
-                    readonly="readonly"
-                    value="1"
-                    name="num"
-                    id="num"
-                  />
-                </div>
-                <div class="input_right">+</div>
-              </div>
-            </div>
-
-          </li>
-
-          <li class="item">
-            <div class="left_food">
-              <img src="../assets/images/1.jpg" />
-              <div class="food_info">
-                <p>老干妈炒肥肠</p>
-                <p class="price">¥48</p>
-              </div>
-
-            </div>
-
-            <div id="right_cart">
-              <div class="cart_num">
-                <div class="input_left">-</div>
-                <div class="input_center">
-                  <input
-                    type="text"
-                    readonly="readonly"
-                    value="1"
-                    name="num"
-                    id="num"
-                  />
-                </div>
-                <div class="input_right">+</div>
+                <div
+                  class="input_right"
+                  @click="incCount(item)"
+                >+</div>
               </div>
             </div>
 
@@ -198,11 +152,45 @@
 </template>
 <script>
 import NavFooter from './public/NavFooter'
+import config from '../model/config'
 export default {
   data () {
     return {
-
+      api: config.api,
+      list: []
     }
+  },
+  methods: {
+    getCartData () {
+      this.$http.get(`${this.api}api/cartlist?uid=a001`).then(resp => {
+        this.list = resp.body.result
+      }, err => {
+
+      })
+    },
+    decCount (item, index) {
+      this.$http.get(`${this.api}api/decCart?uid=a001&product_id=${item.product_id}&num=${item.num}`).then(resp => {
+
+      }, err => {
+
+      })
+      if (item.num === 1) {
+        this.list.splice(index, 1);
+      } else {
+        --item.num
+      }
+    },
+    incCount (item) {
+      this.$http.get(`${this.api}api/incCart?uid=a001&product_id=${item.product_id}&num=${item.num}`).then(resp => {
+
+      }, err => {
+
+      })
+      ++item.num
+    }
+  },
+  mounted () {
+    this.getCartData()
   },
   components: {
     NavFooter

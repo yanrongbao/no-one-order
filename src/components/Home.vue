@@ -80,8 +80,10 @@
       id="footer_cart"
       class="footer_cart"
     >
-      <img src="../assets/images/cart.png" />
-      <p>购物车</p>
+      <router-link to="/cart">
+        <img src="../assets/images/cart.png" />
+        <p>购物车</p>
+      </router-link>
       <span
         class="num"
         v-if="cartNum"
