@@ -12,6 +12,7 @@ const routes = [
     { path: '/pcontent', component: resolve => require(['../components/Pcontent.vue'], resolve) },
     { path: '/search', component: resolve => require(['../components/Search.vue'], resolve) },
     { path: '/cart', component: resolve => require(['../components/Cart.vue'], resolve) },
+    { path: '/editpeopleinfo', component: resolve => require(['../components/editPeopleInfo.vue'], resolve) },
     { path: '*', redirect: '/start' }
 ]
 
