@@ -2,31 +2,39 @@
   <div id="cart">
     <div class="cart_content">
 
-      <div class="cart_info">
+      <div
+        class="cart_info"
+        v-if="totalNumber"
+      >
 
         <h2>购物车</h2>
 
         <div class="p_number">
           <div class="p_number_left">
-            <p>用餐人数:2人</p>
-            <p>备注:无</p>
+            <p>用餐人数:{{peopleList.p_num}}人</p>
+            <p>备注:{{peopleList.p_mark?peopleList.p_mark:'无'}}</p>
           </div>
           <div class="p_number_right">
-            <img src="../assets/images/edit.png" />
-            <p>修改</p>
+            <router-link to="/editpeopleinfo">
+              <img src="../assets/images/edit.png" />
+              <p>修改</p>
+            </router-link>
           </div>
 
         </div>
 
         <div class="cart_p_num">
 
-          <p>购物车中总共有6个菜</p>
+          <p>购物车中总共有{{totalNumber}}个菜</p>
 
-          <p>合计：<span class="price">¥58</span></p>
+          <p>合计：<span class="price">¥{{allPrice}}</span></p>
         </div>
       </div>
 
-      <div class="cart_list">
+      <div
+        class="cart_list"
+        v-if="totalNumber"
+      >
 
         <ul>
           <li
@@ -69,10 +77,11 @@
         </ul>
       </div>
 
-      <div class="hot_food">
-
+      <div
+        class="hot_food"
+        v-if="!totalNumber"
+      >
         <h3>本店顾客最长点的菜</h3>
-
         <div class="item_list_outer">
           <ul class="item_list">
             <li>
@@ -130,14 +139,19 @@
 
       </div>
     </div>
-
+    <div
+      v-if="!totalNumber"
+      class="cart_empty"
+    >您的购物车空空的，点击菜单开始点菜</div>
     <nav-footer></nav-footer>
     <div
       id="footer_book"
       class="footer_book"
     >
-      <img src="../assets/images/menu.png" />
-      <p>菜单</p>
+      <router-link to="/home">
+        <img src="../assets/images/menu.png" />
+        <p>菜单</p>
+      </router-link>
     </div>
 
     <div
@@ -145,7 +159,7 @@
       class="footer_cart"
     >
       <img src="../assets/images/cart.png" />
-      <p>购物车</p>
+      <p>下单</p>
     </div>
 
   </div>
@@ -157,7 +171,30 @@ export default {
   data () {
     return {
       api: config.api,
-      list: []
+      list: [],
+      peopleList: {}
+    }
+  },
+  computed: {
+    allPrice () {
+      let allPrice = 0;
+      this.list.forEach((elem, index) => {
+        if (index !== 0) {
+          allPrice += Number.parseFloat(elem.price * elem.num)
+        }
+
+      })
+      return allPrice
+    },
+    totalNumber () {
+      let totalNumber = 0;
+      this.list.forEach((elem, index) => {
+        if (index !== 0) {
+          totalNumber += elem.num
+        }
+
+      })
+      return totalNumber
     }
   },
   methods: {
@@ -187,10 +224,18 @@ export default {
 
       })
       ++item.num
+    },
+    getPeopleInfoList () {
+      this.$http.get(`${this.api}api/peopleInfoList?uid=a002`).then(resp => {
+        this.peopleList = resp.body.result[0];
+      }, err => {
+
+      })
     }
   },
   mounted () {
     this.getCartData()
+    this.getPeopleInfoList()
   },
   components: {
     NavFooter

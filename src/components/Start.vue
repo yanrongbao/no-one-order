@@ -10,92 +10,107 @@
 
       <div class="content">
         <ul class="user_list">
-          <li>
-            <span>1人</span>
+          <li
+            :class="{active:item===p_num}"
+            v-for="item in p_list"
+            :key="item"
+            @click="p_num = item"
+          >
+            <span>{{item}}人</span>
           </li>
-          <li>
-            <span>
-              2人
-            </span>
+        </ul>
+        <div class="mark_input">
+          <input
+            type="text"
+            v-model="p_mark"
+            placeholder="请输入您的口味要求(可不填)"
+          >
+        </div>
+        <ul class="mark_list">
+          <li
+            v-for="(item,index) in mark_list"
+            :key="index"
+            @click="selectKouwei(item)"
+            :class="{active:item.select}"
+          >
+            <span>{{item.text}}</span>
           </li>
-          <li>
-            <span>
-              3人
-            </span>
-          </li>
-
-          <li>
-            <span>
-              4人
-            </span>
-          </li>
-          <li>
-            <span>
-              5人
-            </span>
-          </li>
-          <li>
-            <span>
-              6人
-            </span>
-          </li>
-          <li>
-            <span>
-              7人
-            </span>
-          </li>
-          <li>
-            <span>
-              8人
-            </span>
-          </li>
-          <li>
-            <span>
-              9人
-            </span>
-          </li>
-          <li>
-            <span>
-              10人
-            </span>
-          </li>
-          <li>
-            <span>
-              11人
-            </span>
-          </li>
-
-          <li>
-            <span>
-              12人
-            </span>
-          </li>
-
         </ul>
       </div>
 
     </div>
-    <router-link to='/home'>
-      <div
-        id="start"
-        class="start"
-      >
+    <div
+      id="start"
+      class="start"
+      @click="addPeopleInfo"
+    >
+      <span>
+        开始点菜
+      </span>
 
-        <span>
-          开始点菜
-        </span>
-
-      </div>
-    </router-link>
+    </div>
   </div>
 </template>
 <script>
+import config from '../model/config'
 export default {
   data () {
     return {
-
+      api: config.api,
+      p_list: 12,
+      p_num: 2,
+      mark_list: [
+        { text: '打包带走', select: false },
+        { text: '不要放辣椒', select: false },
+        { text: '微辣', select: false }
+      ]
     }
-  }
+  },
+  computed: {
+    p_mark () {
+      let p_mark = '';
+      this.mark_list.forEach(elem => {
+        if (elem.select) {
+          p_mark += ' ' + elem.text;
+        }
+      })
+      return p_mark;
+    }
+  },
+  methods: {
+    addChangeEvent () {
+      const that = this;
+      const lis = document.querySelectorAll('.user_list li')
+      for (let i = 0; i < lis.length; i++) {
+        lis[i].onclick = function () {
+          for (let j = 0; j < lis.length; j++) {
+            lis[j].className = ''
+          }
+          this.className = 'active'
+          that.p_num = this.querySelector('span').innerHTML.trim()
+        }
+      }
+    },
+    selectKouwei (item) {
+      item.select = !item.select
+    },
+    addPeopleInfo () {
+      this.$http.post(`${this.api}api/addPeopleInfo`, {
+        uid: 'a002',
+        p_num: this.p_num,
+        p_mark: this.p_mark,
+      }).then(resp => {
+        if (resp.body.success) {
+          this.$router.push({
+            path: 'home'
+          })
+        }
+      }, (err => {
+
+      }))
+    }
+  },
+  mounted () { }
 }
 </script>
 <style lang="scss" scoped>
@@ -132,8 +147,17 @@ export default {
 
     margin: 1rem 0rem;
   }
-
-  .user_list {
+  .mark_input {
+    padding: 1rem;
+    input {
+      height: 3rem;
+      line-height: 3rem;
+      width: 100%;
+      border: 1px solid #eee;
+    }
+  }
+  .user_list,
+  .mark_list {
     display: flex;
 
     flex-wrap: wrap;
@@ -155,6 +179,13 @@ export default {
         background: #fff;
         border-radius: 0.5rem;
         border: 1px solid #ccc;
+      }
+      &.active {
+        span {
+          background: red;
+          color: #fff;
+          border: 1px solid red;
+        }
       }
     }
   }
