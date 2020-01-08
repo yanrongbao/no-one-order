@@ -12,7 +12,7 @@
           </div>
         </div>
 
-        <h3>已点菜品6份,合计 : <span class="price">60元</span> </h3>
+        <h3>已点菜品{{list.total_num}}份,合计 : <span class="price">{{list.total_price}}元</span> </h3>
 
       </div>
 
@@ -22,52 +22,22 @@
 
         <h3>菜品详情:</h3>
         <ul class="list">
-          <li>
+          <li
+            v-for="(item,index) in list.items"
+            :key="index"
+          >
             <div class="title">
-              烧茄子
+              {{item.title}}/已下厨
             </div>
 
             <div class="num">
 
-              1份
+              {{item.num}}份
             </div>
 
             <div class="price">
 
-              12元
-            </div>
-
-          </li>
-
-          <li>
-            <div class="title">
-              烧茄子
-            </div>
-
-            <div class="num">
-
-              1份
-            </div>
-
-            <div class="price">
-
-              12元
-            </div>
-
-          </li>
-          <li>
-            <div class="title">
-              手撕包菜
-            </div>
-
-            <div class="num">
-
-              1份
-            </div>
-
-            <div class="price">
-
-              12元
+              {{item.price}}元
             </div>
 
           </li>
@@ -77,14 +47,45 @@
       </div>
 
     </div>
+    <nav-footer></nav-footer>
+    <div
+      id="footer_book"
+      class="footer_book"
+      style="left:auto;right:5px;"
+    >
+      <router-link to="/home">
+        <img src="../assets/images/menu.png" />
+        <p>菜单</p>
+      </router-link>
+    </div>
   </div>
 </template>
 <script>
+import NavFooter from './public/NavFooter'
+import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
-
+      list: [],
+      api: config.api,
     }
+  },
+  methods: {
+    getOrder () {
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/getOrder?uid=${uid}`).then(resp => {
+        this.list = resp.body.result[0]
+      }, err => {
+
+      })
+    }
+  },
+  mounted () {
+    this.getOrder()
+  },
+  components: {
+    NavFooter
   }
 }
 </script>

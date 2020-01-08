@@ -1,6 +1,12 @@
 <template>
   <div id="start">
-    <div class="start_content">
+    <div v-if="showLoading">
+      showLoading........
+    </div>
+    <div
+      class="start_content"
+      v-if="!showLoading"
+    >
 
       <header class="start_header">
         <img src="../assets/images/canju.png" /> 用餐人数
@@ -64,7 +70,8 @@ export default {
         { text: '打包带走', select: false },
         { text: '不要放辣椒', select: false },
         { text: '微辣', select: false }
-      ]
+      ],
+      showLoading: true
     }
   },
   computed: {
@@ -110,9 +117,22 @@ export default {
       }, (err => {
 
       }))
+    },
+    getPeopleInfoList () {
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/peopleInfoList?${uid}`).then(resp => {
+        this.showLoading = false
+        if (resp.body.result.length) {
+          this.$router.push({ path: '/home' })
+        }
+      }, err => {
+
+      })
     }
   },
-  mounted () { }
+  created () {
+    this.getPeopleInfoList()
+  }
 }
 </script>
 <style lang="scss" scoped>

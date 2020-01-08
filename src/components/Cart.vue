@@ -156,6 +156,7 @@
 
     <div
       id="footer_cart"
+      @click="addOrder"
       class="footer_cart"
     >
       <img src="../assets/images/cart.png" />
@@ -233,6 +234,28 @@ export default {
       const uid = storage.get('roomId')
       this.$http.get(`${this.api}api/peopleInfoList?uid=${uid}`).then(resp => {
         this.peopleList = resp.body.result[0];
+      }, err => {
+
+      })
+    },
+    addOrder () {
+      const uid = storage.get('roomId')
+      const p_num = this.peopleList.p_num
+      const p_mark = this.peopleList.p_mark
+      const total_price = this.allPrice
+      const total_num = this.totalNumber
+      const order = JSON.stringify(this.list)
+      this.$http.post(`${this.api}api/addOrder`, {
+        uid,
+        p_num,
+        p_mark,
+        total_price,
+        total_num,
+        order
+      }).then(resp => {
+        if (resp.body.success) {
+          this.$router.push({ path: 'order' })
+        }
       }, err => {
 
       })
