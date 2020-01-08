@@ -57,6 +57,7 @@
 </template>
 <script>
 import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
@@ -82,8 +83,9 @@ export default {
       ++this.num
     },
     addCart () {
+      const uid = storage.get('roomId')
       this.$http.post(`${this.api}api/addcart`, {
-        uid: 'a001',
+        uid,
         title: this.list.title,
         price: this.list.price,
         num: this.num,
@@ -91,6 +93,7 @@ export default {
         img_url: this.list.img_url,
       }).then(resp => {
         if (resp.body.success) {
+          this.$socket.emit('addcart', 'addcart')
           this.$router.push({
             path: 'home'
           })

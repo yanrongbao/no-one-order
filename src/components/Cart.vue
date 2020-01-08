@@ -167,6 +167,7 @@
 <script>
 import NavFooter from './public/NavFooter'
 import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
@@ -175,39 +176,41 @@ export default {
       peopleList: {}
     }
   },
+  sockets: {
+    addcart: function () {
+      this.getCartData()
+    },
+  },
   computed: {
     allPrice () {
       let allPrice = 0;
       this.list.forEach((elem, index) => {
-        if (index !== 0) {
-          allPrice += Number.parseFloat(elem.price * elem.num)
-        }
-
+        allPrice += Number.parseFloat(elem.price * elem.num)
       })
       return allPrice
     },
     totalNumber () {
       let totalNumber = 0;
       this.list.forEach((elem, index) => {
-        if (index !== 0) {
-          totalNumber += elem.num
-        }
-
+        totalNumber += elem.num
       })
       return totalNumber
     }
   },
   methods: {
     getCartData () {
-      this.$http.get(`${this.api}api/cartlist?uid=a001`).then(resp => {
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/cartlist?uid=${uid}`).then(resp => {
         this.list = resp.body.result
+        console.log(this.list)
       }, err => {
 
       })
     },
     decCount (item, index) {
-      this.$http.get(`${this.api}api/decCart?uid=a001&product_id=${item.product_id}&num=${item.num}`).then(resp => {
-
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/decCart?uid=${uid}&product_id=${item.product_id}&num=${item.num}`).then(resp => {
+        this.$socket.emit('addcart', 'addcart')
       }, err => {
 
       })
@@ -218,15 +221,17 @@ export default {
       }
     },
     incCount (item) {
-      this.$http.get(`${this.api}api/incCart?uid=a001&product_id=${item.product_id}&num=${item.num}`).then(resp => {
-
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/incCart?uid=${uid}&product_id=${item.product_id}&num=${item.num}`).then(resp => {
+        this.$socket.emit('addcart', 'addcart')
       }, err => {
 
       })
       ++item.num
     },
     getPeopleInfoList () {
-      this.$http.get(`${this.api}api/peopleInfoList?uid=a002`).then(resp => {
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/peopleInfoList?uid=${uid}`).then(resp => {
         this.peopleList = resp.body.result[0];
       }, err => {
 

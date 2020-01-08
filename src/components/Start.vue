@@ -53,6 +53,7 @@
 </template>
 <script>
 import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
@@ -95,8 +96,9 @@ export default {
       item.select = !item.select
     },
     addPeopleInfo () {
+      const uid = storage.get('roomId')
       this.$http.post(`${this.api}api/addPeopleInfo`, {
-        uid: 'a002',
+        uid,
         p_num: this.p_num,
         p_mark: this.p_mark,
       }).then(resp => {

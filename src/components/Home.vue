@@ -95,6 +95,7 @@
 //引入nav
 import NavFooter from './public/NavFooter'
 import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
@@ -102,6 +103,11 @@ export default {
       api: config.api,
       cartNum: 0
     }
+  },
+  sockets: {
+    addcart: function () {
+      this.getCartCount()
+    },
   },
   methods: {
     asideDomInit () {
@@ -155,7 +161,8 @@ export default {
       bg.style.display = 'none';
     },
     getCartCount () {
-      this.$http.get(`${this.api}api/cartCount?uid=a001`).then(resp => {
+      const uid = storage.get('roomid')
+      this.$http.get(`${this.api}api/cartCount?uid=${uid}`).then(resp => {
         this.cartNum = resp.body.result
       }, error => {
 

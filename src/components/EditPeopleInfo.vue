@@ -64,6 +64,7 @@
 </template>
 <script>
 import config from '../model/config'
+import storage from '../model/storage'
 export default {
   data () {
     return {
@@ -106,8 +107,9 @@ export default {
       this.p_mark = this.p_mark_list.join(' ')
     },
     addPeopleInfo () {
+      const uid = storage.get('roomId')
       this.$http.post(`${this.api}api/addPeopleInfo`, {
-        uid: 'a002',
+        uid,
         p_num: this.p_num,
         p_mark: this.p_mark,
       }).then(resp => {
@@ -121,7 +123,8 @@ export default {
       }))
     },
     getPeopleInfoList () {
-      this.$http.get(`${this.api}api/peopleInfoList?uid=a002`).then(resp => {
+      const uid = storage.get('roomId')
+      this.$http.get(`${this.api}api/peopleInfoList?${uid}`).then(resp => {
         this.p_num = resp.body.result[0].p_num;
         this.p_mark = resp.body.result[0].p_mark;
       }, err => {
